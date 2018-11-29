@@ -38,16 +38,20 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(24,GPIO.IN,pll_up_down=GPIO.PUD_UP)
 
 while True:
-	SwitchStatus = GPIO.input(24)
-	if(SwitchStatus == 0):
-		print('Button pressed')
+	s0= GPIO.input(24)
+        if(s0 == 0):
+                print('Button pressed')
+        else:
+                print('Button released')
 
-		h0, t0= Adafruit_DHT.read_retry(sensor, pin)
-		print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
-		payload = {"datapoints":[{"dataChnId":"Humidity","values":{"value":h0}},
+        h0, t0= Adafruit_DHT.read_retry(sensor, pin)
+        if humidity is not None and temperature is not None:
+                print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(t0, h0))
+                payload = {"datapoints":[{"dataChnId":"humidity","values":{"val$
                         {"dataChnId":"Temperature","values":{"value":t0}},
-			{"dataChnID":"SwitchStatus","values":{"value":SwitchStatus}]}
+                        {"dataChnId":"SwitchStatus","values":{"value":s0}}]}
                 post_to_mcs(payload)
-                time.sleep(10)
-	else:
-		print('Button released')
+        else:
+                print('Failed to get reading. Try again!')
+                sys.exit(1)
+        time.sleep(1)
